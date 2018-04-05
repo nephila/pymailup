@@ -2,6 +2,9 @@
 
 import base64
 import json
+import traceback
+
+import OpenSSL
 import requests
 import time
 
@@ -25,7 +28,7 @@ _initial_client_configuration = {
     'MAILUP_PASSWORD': None,
     'MAILUP_CLIENT_ATTEMPTS': 20,
     'MAILUP_DEFAULT_PAGE_SIZE': 50,
-    'MAILUP_CLIENT_TIMEOUT': 60,
+    'MAILUP_CLIENT_TIMEOUT': 30,
     'MAILUP_CLIENT_TIMEOUT_403': 60,
     'MAILUP_CLIENT_ATTEMPT_WAIT': 2,
 }
@@ -144,7 +147,6 @@ class MailUpClient(object):
         timeout = timeout or self.configuration_dict['MAILUP_CLIENT_TIMEOUT']
         page_size = page_size or self.configuration_dict['MAILUP_DEFAULT_PAGE_SIZE']
 
-
         # PARAMS FOR RESPONSE LIB
         if params is None:
             params = {}
@@ -203,6 +205,11 @@ class MailUpClient(object):
                 except TypeError:
                     break
 
+            elif response.status_code == 400:
+                error_message = 'Response status 401: {}'.format(response.json()['error_description'])
+                self.logger.error(error_message)
+                raise exceptions.ClientAuthenticationException(error_message)
+
             # 401: unauthorised
             elif response.status_code == 401:
                 self.logger.error('Response status 401')
@@ -253,15 +260,20 @@ class MailUpClient(object):
                     timeout=self.configuration_dict['MAILUP_CLIENT_TIMEOUT']
                 )
                 return response
-            except requests.exceptions.Timeout:
+            except Exception as e:
+                error_message = traceback.format_exc()
                 self.logger.error(
-                    'ERROR during attempt {}/{}: MailUpRequest Timeout'.format(i+1, attempts)
+                    'ERROR during attempt {index}/{attempts}: MailUpRequest Error:\n{error_message}'.format(
+                        index=i+1,
+                        attempts=attempts,
+                        error_message=error_message,
+                    )
                 )
                 if i != attempts:
                     self.logger.error(
-                        'Recalling API after {} seconds'.format(self.configuration_dict['MAILUP_CLIENT_ATTEMPT_WAIT'])
+                        'Recalling API after {} seconds'.format(timeout)
                     )
-                time.sleep(self.configuration_dict['MAILUP_CLIENT_ATTEMPT_WAIT'])
+                time.sleep(timeout)
         raise exceptions.MailUpCallError('Max attempts exceeded')
 
     def retrieve_access_token(self):
@@ -284,6 +296,8 @@ class MailUpClient(object):
             )
         }
         rest_request_json = self.call_handler("POST", url, params=params, headers=headers)
+        if not rest_request_json:
+            raise exceptions.MailUpCallError('Impossible to retrieve access token from MailUp')
         self.access_token = rest_request_json["access_token"]
         self.refreshed_token = rest_request_json["refresh_token"]
         self.logger.debug('Access token retrieved')

@@ -11,7 +11,7 @@ Below the steps to create a client and a provider.
 
 To build a client you need the credentials obtained from your MailUp account: "CLIENT_ID", "CLIENT_SECRET", "USERNAME" and "PASSWORD"::
 
-    from mailup.object_providers import MailUpObjectProvider
+    from mailup.providers import MailUpComponentProvider
     from mailup.clients import MailUpClientSingleton
 
     # client
@@ -23,7 +23,7 @@ To build a client you need the credentials obtained from your MailUp account: "C
     )
 
     # provider
-    provider = MailUpObjectProvider(client=mailup_client)
+    provider = MailUpComponentProvider(client=mailup_client)
 
 
 

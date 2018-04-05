@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pymailup',
-    version='0.3.0',
+    version='0.3.5',
     license='BSD',
     description='MailUp library based on API',
     long_description='%s\n%s' % (
@@ -64,9 +64,9 @@ setup(
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
     install_requires=[
-        'requests', 
+        'requests',
         'ndg-httpsclient',
-        ],  
+        ],
     extras_require={
         # eg:
         #   'rst': ['docutils>=0.11'],

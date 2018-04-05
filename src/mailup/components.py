@@ -727,7 +727,7 @@ class Recipient(MailUpComponent):
             data_dict=self.data_dict,
             confirm_email=confirm_email,
         )
-        self.logger.info('Recipient {recipient_id} has been successfully Group to group {group_id}'.format(
+        self.logger.info('Recipient {recipient_id} has been successfully added to group {group_id}'.format(
             recipient_id=self.id,
             group_id=group_id,
         ))

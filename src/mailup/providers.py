@@ -247,6 +247,37 @@ class MailUpComponentProvider(object):
             ))
             return recipient
 
+    def create_or_update_recipient(self, data_dict, confirm_email=False):
+        from mailup.components import Recipient
+
+        if confirm_email:
+            status = 'pending'
+        else:
+            status = 'subscribed'
+
+        # check data_dict, not valid InvalidConfigurationException is rise
+        Recipient(data_dict)
+
+        list_id = data_dict['idList']
+
+        recipient = Recipient(
+            data_dict=data_dict,
+            client=self.client,
+            logger=self.logger,
+            status=status,
+        )
+
+        recipient_id = self.client.add_recipient_to_list(
+            list_id=list_id,
+            data_dict=recipient.data_dict,
+            confirm_email=confirm_email
+        )
+        recipient.data_dict['idRecipient'] = recipient_id
+        self.logger.info('Recipient {new_recipient} created successfully'.format(
+            new_recipient=recipient
+        ))
+        return recipient
+
     def get_recipient(self, list_id, recipient_id=None, email=None, status=None, write_log=True):
         from mailup.components import Recipient
 

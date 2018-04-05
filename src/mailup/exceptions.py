@@ -39,6 +39,23 @@ class ClientNotEnabledException(MailUpException):
         super(ClientNotEnabledException, self).__init__(write_log)
 
 
+class ClientAuthenticationException(MailUpException):
+    """
+    To import:
+        import exceptions
+
+    To declare in a class add a class attribute:
+        ClientAuthenticationException = exceptions.ClientAuthenticationException
+
+    To raise:
+        raise self.ClientAuthenticationException()
+    """
+
+    def __init__(self, error_text, write_log=True):
+        self.error_text = error_text
+        super(ClientAuthenticationException, self).__init__(write_log)
+
+
 class MailUpCallError(MailUpException):
     """
     To import:

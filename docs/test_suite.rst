@@ -8,7 +8,7 @@ Test suite create a 'TEST-PYMAILUP' List where random recipient are created, sub
 
 To run test::
 
-    python -m mailup --client-id CLIENT_ID --client-secret CLIENT_SECRET --username USERNAME --password PASSWORD --owner-email youremail@domain.com
+    python -m mailup CLIENT_ID --client-secret CLIENT_SECRET --username USERNAME --password PASSWORD --owner-email youremail@domain.com
 
 if you want see log during test executing you can pass next arguments (not required)::
 
