@@ -206,7 +206,10 @@ class MailUpClient(object):
                     break
 
             elif response.status_code == 400:
-                error_message = 'Response status 401: {}'.format(response.json()['error_description'])
+                try:
+                    error_message = 'Response status 401: {}'.format(response.json()['error_description'])
+                except KeyError:
+                    error_message = 'Response status 401: {}'.format(response.text)
                 self.logger.error(error_message)
                 raise exceptions.ClientAuthenticationException(error_message)
 
